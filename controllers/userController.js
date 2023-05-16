@@ -75,5 +75,18 @@ export const updateUser = async (req, res) => {
 
 // delete user (user and admin allow)
 export const deleteUser = async (req, res) => {
-
+  const userId = req.params.id;
+  try {
+    const delUser = await User.findByIdAndDelete({ _id: userId });
+    res.status(200).json({
+      success: true,
+      message: 'successfully deleted user',
+      data: delUser
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'something weng wrong, try again'
+    });
+  }
 };
