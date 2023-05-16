@@ -20,11 +20,19 @@ export const createNewUser = async (req, res) => {
 
 // get all valid users (only admin allowed)
 export const getUsers = async (req, res) => {
-try {
-    
-} catch (err) {
-    
-}
+  try {
+    const users = await User.find({});
+    res.status(200).json({
+      success: true,
+      message: 'users found',
+      data: users
+    });
+  } catch (err) {
+    res.status(404).json({
+      success: false,
+      message: 'not found, try again'
+    });
+  }
 };
 
 // get single user( admin and user allowed)
