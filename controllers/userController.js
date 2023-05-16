@@ -55,7 +55,22 @@ export const getSingleUser = async (req, res) => {
 
 // update user (user allowed)
 export const updateUser = async (req, res) => {
-
+  const userId = req.params.id;
+  try {
+    const user = await User.findByIdAndUpdate({ _id: userId },
+      { $set: req.body },
+      { new: true });
+    res.status(200).json({
+      success: true,
+      message: 'successful',
+      data: user
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'something went wrong, try again'
+    });
+  }
 };
 
 // delete user (user and admin allow)
