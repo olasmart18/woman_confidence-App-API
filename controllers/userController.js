@@ -37,7 +37,20 @@ export const getUsers = async (req, res) => {
 
 // get single user( admin and user allowed)
 export const getSingleUser = async (req, res) => {
-
+  const userId = req.params.id;
+  try {
+    const user = await User.findOne({ _id: userId });
+    res.status(200).json({
+      success: true,
+      message: 'successful',
+      data: user
+    });
+  } catch (err) {
+    res.status(404).json({
+      success: false,
+      message: 'not found, try again'
+    });
+  }
 };
 
 // update user (user allowed)
