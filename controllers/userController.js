@@ -1,13 +1,30 @@
-import user from '../model/user.js';
+import User from '../model/user.js';
 
 // create new user (user allowed)
 export const createNewUser = async (req, res) => {
-
+  const newUser = new User(req.body);
+  try {
+    const saveUser = await newUser.save();
+    res.status(200).json({
+      success: true,
+      message: 'successful',
+      data: saveUser
+    });
+  } catch (err) {
+    res.status(401).json({
+      success: false,
+      message: 'something went wrong, try again'
+    });
+  }
 };
 
 // get all valid users (only admin allowed)
 export const getUsers = async (req, res) => {
-
+try {
+    
+} catch (err) {
+    
+}
 };
 
 // get single user( admin and user allowed)
