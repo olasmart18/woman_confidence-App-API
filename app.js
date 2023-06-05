@@ -6,6 +6,8 @@ import bodyParser from 'body-parser';
 import dbconnect from './config/dbConfig.js';
 import userRoute from './route/user.js';
 import homeRoute from './route/home.js';
+import storyRoute from './route/userStory.js';
+
 dotenv.config();
 
 const app = express();
@@ -16,8 +18,9 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
-app.use('/', userRoute);
-app.use('/', homeRoute);
+app.use('/wmapp', userRoute);
+app.use('/wmapp', homeRoute);
+app.use('/wmapp', storyRoute);
 
 // test route
 app.get('/', (req, res) => {

@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
 
 const commentSchema = new mongoose.Schema({
-  comment: {
-    type: String,
-    Date: Date.now()
-  }
+  // comment: [{
+  //   type: mongoose.Types.ObjectId,
+  //   ref: 'Story'
+  // }]
+  comment : String
 });
 
-const Comment = mongoose.Model('Comment', commentSchema);
+const Comment = mongoose.model('Comment', commentSchema);
 
 export default Comment;

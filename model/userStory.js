@@ -1,15 +1,34 @@
 import mongoose from 'mongoose';
 
+// const commentSchema = new mongoose.Schema({
+//   comment: {
+//     type: String
+//   }
+// });
+// const likeSchema = new mongoose.Schema({
+//   likes: {
+//     types: Number
+//   }
+// });
+
+// const shareSchema = new mongoose.Schema({
+//   share: {
+//     tpye: Number
+//   }
+// });
+
 const userStorySchema = new mongoose.Schema({
   story: {
     type: String
   },
-  comment: {
-    type: mongoose.objectId,
-    ref: 'Comment'
-  }
+  comment: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }]
+  // comment: String
+
+//   comment: [commentSchema],
+//   like: [likeSchema],
+//   share: [shareSchema]
 }, { timestamps: true });
 
-const Stories = mongoose.Model('Stories', userStorySchema);
+const Story = mongoose.model('Story', userStorySchema);
 
-export default Stories;
+export default Story;
