@@ -48,36 +48,36 @@ export const register = async (req, res) => {
 // login user with hash passord
 
 export const login = async (req, res) => {
-try {
+  try {
     const email = req.body.email;
     const password = req.body.password;
 
     // checking for correct user email in db
-    const findEmail = await User.findOne({email: email});
+    const findEmail = await User.findOne({ email: email });
     if (findEmail) {
-        const checkCorrectPwd = bcrypt.compareSync(password, findEmail.password);
-        if(!checkCorrectPwd) {
-            res.status(404).json({
-                success: false,
-                message: 'incorrect password or user'
-            })
-        } else {
-            res.status(200).json({
-                success: true,
-                message: 'Login successful'
-            })
-        }
-    } else {
+      const checkCorrectPwd = bcrypt.compareSync(password, findEmail.password);
+      if (!checkCorrectPwd) {
         res.status(404).json({
-            success: false,
-            message: 'email does not exist'
-        })
+          success: false,
+          message: 'incorrect password or user'
+        });
+      } else {
+        res.status(200).json({
+          success: true,
+          message: 'Login successful'
+        });
+      }
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'email does not exist'
+      });
     }
-} catch (err) {
+  } catch (err) {
     res.status(500).json({
       success: false,
       message: 'something went wrong while loggingIn, try again'
-    })
-}
+    });
+  }
 }
 ;
