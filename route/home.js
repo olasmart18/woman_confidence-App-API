@@ -12,12 +12,12 @@ import {
 
 const route = express.Router();
 
-route.get('/wmapp/home', homePage);
-route.get('/wmapp/home/event', events);
-route.get('/wmapp/home/notification', notifications);
-route.get('/wmapp/home/councellor', councellor);
-route.get('/wmapp/home/stories', recentStory);
-route.get('/wmapp/home/dailyQuote', dailyQuote);
-route.get('/wmapp/home/groups', discoverGroup);
+route.get('/home', homePage);
+route.get('/home/event', events);
+route.get('/home/notification', notifications);
+route.get('/home/councellor', councellor);
+route.get('/home/stories', recentStory);
+route.get('/home/dailyQuote', dailyQuote);
+route.get('/home/groups', discoverGroup);
 
 export default route;
