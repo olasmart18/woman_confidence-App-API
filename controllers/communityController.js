@@ -1,4 +1,5 @@
 import Story from '../model/userStory.js';
+import User from '../model/user.js';
 // import comment from '../model/comment.js';
 
 // get all user stories (access: users amd admin)
@@ -20,18 +21,29 @@ export const getallStories = async (req, res) => {
 
 // post stories (access: user)
 export const writeStories = async (req, res) => {
-  const composeStory = new Story({
+ try {
+  const userId = req.params.userId;
+  await User.findOne({_id: userId})
+  .then( async (user) => {
+    if(!user) return res.json({
+      message: 'sign up to continue'
+    })
+   const newStory = await new Story({
     story: req.body.story,
-    comment: req.body.comment
-  });
-  try {
-    const postStory = await composeStory.save();
+    userId: userId
+  }).save()
     res.status(200).json({
       success: true,
       message: 'successful',
-      data: postStory
+      data: newStory
     });
-  } catch (err) {
+  }).catch((err) => {
+    res.json({
+      message: err.messages,
+      data: err
+    })
+  })
+  }catch (err) {
     res.status(400).json({
       success: false,
       message: 'error, try again'

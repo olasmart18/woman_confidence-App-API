@@ -8,7 +8,7 @@ import {
 
 const route = express.Router();
 
-route.post('/me/compose/story', writeStories);
+route.post('/story/:userId', writeStories);
 route.get('/stories', getallStories);
 route.put('/stories/:id', comments);
 

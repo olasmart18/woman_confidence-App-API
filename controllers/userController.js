@@ -57,7 +57,7 @@ export const getSingleUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   const userId = req.params.id;
   try {
-    const user = await User.findByIdAndUpdate({ _id: userId },
+    const user = await User.findByIdAndUpdate(userId,
       { $set: req.body },
       { new: true });
     res.status(200).json({
@@ -77,7 +77,7 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   const userId = req.params.id;
   try {
-    const delUser = await User.findByIdAndDelete({ _id: userId });
+    const delUser = await User.findByIdAndDelete(userId);
     res.status(200).json({
       success: true,
       message: 'successfully deleted user',
