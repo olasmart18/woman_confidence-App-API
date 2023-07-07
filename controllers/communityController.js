@@ -1,6 +1,6 @@
 import Story from '../model/userStory.js';
 import User from '../model/user.js';
-// import comment from '../model/comment.js';
+import Comment from '../model/comment.js';
 
 // get all user stories (access: users amd admin)
 export const getallStories = async (req, res) => {
@@ -53,16 +53,41 @@ export const writeStories = async (req, res) => {
 
 // write comment (access: users and admin);
 export const comments = async (req, res) => {
-  const comment = req.body.comment;
   try {
-    const myComment = await Story.findByIdAndUpdate({ _id: req.params.id },
-      { $set: { comment: comment } },
+     const comment = req.body.comment;
+     const storyId = req.params.storyId;
+     const userId = req.params.userId;
+
+     await User.findById(userId) // find valid user
+     .then( async (user) => {
+      if (!user) return res.json({ message: 'not a user'})
+      await Story.findById(storyId) // find story 
+      .then( async (story) => {
+        // return if story not find
+        if(!story) return res.json({ message: 'not valid story'})
+        // create new comment 
+       const newComment = await new Comment({
+        comment: comment,
+        postId: storyId,
+        userId: userId 
+        }).save() // save comment
+        // append comment id in story collection 
+         const myComment = await Story.findByIdAndUpdate(storyId,
+      { $push: { commentId: newComment } },
       { new: true });
-    res.status(200).json({
+   return res.status(200).json({
       success: true,
       message: 'successful',
-      data: myComment
+      data: newComment
     });
+      })
+     }).catch((err) => {
+      res.json({
+        message: err.messages,
+        data: err
+      })
+     })
+   
   } catch (err) {
     res.status(500).json({
       success: false,

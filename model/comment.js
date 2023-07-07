@@ -12,7 +12,10 @@ const commentSchema = new mongoose.Schema({
     ref: 'user',
     required: true
   },
-  
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const Comment = mongoose.model('Comment', commentSchema);

@@ -10,6 +10,6 @@ const route = express.Router();
 
 route.post('/story/:userId', writeStories);
 route.get('/stories', getallStories);
-route.put('/stories/:id', comments);
+route.post('/comment/:userId/:storyId', comments);
 
 export default route;

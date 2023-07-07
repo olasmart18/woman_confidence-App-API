@@ -9,8 +9,8 @@ const userStorySchema = new mongoose.Schema({
     ref: 'User',
     require: true
   },
-  
-  comment: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }]
+
+  commentId: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }]
  
 }, { timestamps: true });
 
