@@ -7,6 +7,8 @@ import dbconnect from './config/dbConfig.js';
 import userRoute from './route/user.js';
 import homeRoute from './route/home.js';
 import storyRoute from './route/userStory.js';
+import authRoute from './route/auth.js';
+
 
 dotenv.config();
 
@@ -21,6 +23,8 @@ app.use(express.json());
 app.use('/wmapp', userRoute);
 app.use('/wmapp', homeRoute);
 app.use('/wmapp', storyRoute);
+app.use('/wmapp', authRoute);
+
 
 // test route
 app.get('/', (req, res) => {
