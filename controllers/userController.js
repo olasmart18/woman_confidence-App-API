@@ -11,9 +11,9 @@ export const createNewUser = async (req, res) => {
       data: saveUser
     });
   } catch (err) {
-    res.status(401).json({
+    res.status(500).json({
       success: false,
-      message: 'something went wrong, try again'
+      message: err.message
     });
   }
 };

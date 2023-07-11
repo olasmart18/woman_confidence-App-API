@@ -1,7 +1,6 @@
-import Story from '../model/userStory.js';
+ import Story from '../model/userStory.js';
 import User from '../model/user.js';
 import Comment from '../model/comment.js';
-import mongoose, { pluralize } from 'mongoose';
 
 // get all user stories (access: users amd admin)
 export const getallStories = async (req, res) => {
@@ -51,6 +50,50 @@ export const writeStories = async (req, res) => {
     });
   }
 };
+
+//  delete story
+export const deleteStory = async (req, res) => {
+  try {
+    const storyId = req.params.storyId;
+    const userId = req.params.userId;
+   const findStory =  await Story.findById(storyId)
+   if(!findStory) return res.json({
+    message: 'no such story'
+   })
+   const findUser = await User.findById(userId)
+   if (!findUser)  return res.json({
+    message: 'no user found'
+  })
+      if(findUser._id !== findStory.userId){
+        // please look into this condition and contribute,
+        // its not just working
+        console.log(findUser._id);
+        console.log(findStory.userId);
+        //  console.log(findUser._id, findStory.userId)
+      return res.status(401).json({
+        message: 'you cannot delete this post'
+      })
+      }
+      // find all comment in comment collection that has
+      // the postId and delete them all 
+      await Comment.deleteMany({postId: storyId})
+      .then(() => {
+         findStory.deleteOne() // delete story
+     return res.json({
+        message: 'you deleted post'
+      })
+      }).catch((err) => {
+         if(err) return res.status(401).json({
+        message: err.message
+      })
+      })
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+      data: err
+    })
+  }
+}
 
 // write comment (access: users and admin);
 export const comments = async (req, res) => {
@@ -143,3 +186,4 @@ export const deleteComment = async (req, res) => {
     })
   }
 }
+
