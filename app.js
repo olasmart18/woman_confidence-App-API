@@ -1,16 +1,13 @@
 // modules & packages
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import  'dotenv/config.js';
 import bodyParser from 'body-parser';
-import dbconnect from './config/dbConfig.js';
+import dbconnect from './utils/dbConfig.js';
 import userRoute from './route/user.js';
 import homeRoute from './route/home.js';
 import storyRoute from './route/userStory.js';
 import authRoute from './route/auth.js';
-
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
