@@ -1,6 +1,9 @@
 import bcrypt from "bcrypt";
 import Jwt from "jsonwebtoken";
+import crypto from 'crypto';
 import User from "../model/user.js";
+import Token from "../model/token.js";
+import sendEmail from '../utils/emailTransporter.js';
 
 //register new user
 export const register = async (req, res) => {
@@ -79,3 +82,75 @@ export const login = async (req, res) => {
     }
 }
 
+// reset password link
+export const pwdResetLink = async (req, res) => {
+    const { email } = req.body
+    try {
+        // find existing user 
+        await User.findOne({ email: email }).then( async (user) => {
+           if(!user) return res.status(404).json({
+            message: 'user not found'
+           }) 
+           // check if token associated with the user exist
+           await Token.findOne({userId: user._id}).then( async (token) =>{
+            if (token) {
+              await token.deleteOne()
+            }
+            // create a token and save
+           const createToken = crypto.randomBytes(32).toString('hex')
+           if (!createToken) return res.status(400).json({
+            message: 'unable to create token'
+           })
+           // save token to db
+           await new Token({
+            token: createToken,
+            userId: user._id
+           }).save();
+           // password reset link
+           const resetLink = `${process.env.BASE_URL}/password-reset/${createToken}/${user._id}`
+           await sendEmail(user.email, 'reset-password', resetLink)
+           .then(() => {
+            res.status(200).json({
+                message: `reset link sent to ${user.email}`,
+                link: resetLink
+            })
+           })
+           })  
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: err.message,
+            data: err
+        })
+    }
+    }
+    
+    // reset password
+    export const resetPassword = async (req, res) => {
+       const { userId, token } = req.params;
+      try {
+        const error = res.json({
+          message: 'token is not valid'
+        });
+       
+        await User.findOne({ userId: userId }).then( async (user) => {
+          if (!user) return res.status(404).json({
+            message: 'not a user'
+          })
+          await Token.findOne({ userId: user._id}).then((token) => {
+            if (!token) return res.status(404).json({
+              message: 'no token find for user'
+            })
+            if (token.token !== req.params.token) return error
+            // input new password
+            const password = req.body.password;
+
+          })
+        })
+          } catch (err) {
+        res.status(500).json({
+          message: err.message,
+          data: err
+        })
+      }
+    }
