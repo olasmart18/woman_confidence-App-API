@@ -33,7 +33,7 @@ const sendEmail = async ( email, subject, text) => {
             subject: subject,
             text: text
         })
-        console.log('email sent')
+        console.log(`email sent to ${email}`)
         })
        
     } catch (err) {

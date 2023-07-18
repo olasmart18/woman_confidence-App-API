@@ -110,7 +110,7 @@ export const pwdResetLink = async (req, res) => {
            const resetLink = `${process.env.BASE_URL}/password-reset/${createToken}/${user._id}`
            await sendEmail(user.email, 'reset-password', resetLink)
            .then(() => {
-            res.status(200).json({
+            return res.status(200).json({
                 message: `reset link sent to ${user.email}`,
                 link: resetLink
             })
@@ -126,7 +126,7 @@ export const pwdResetLink = async (req, res) => {
     }
     
     // reset password
-    export const resetPassword = async (req, res) => {
+     export const resetPassword = async (req, res) => {
        const { userId, token } = req.params;
       try {
         const error = res.json({
@@ -137,14 +137,26 @@ export const pwdResetLink = async (req, res) => {
           if (!user) return res.status(404).json({
             message: 'not a user'
           })
-          await Token.findOne({ userId: user._id}).then((token) => {
+          await Token.findOne({ userId: user._id, token: token}).then( async (token) => {
             if (!token) return res.status(404).json({
               message: 'no token find for user'
             })
-            if (token.token !== req.params.token) return error
+            if (token.token !== token) return error
             // input new password
             const password = req.body.password;
-
+            // hash new password
+            const saltRound = 10;
+            const salt = bcrypt.genSaltSync(saltRound);
+            const hash = bcrypt.hashSync(password, salt);
+            await User.findByIdAndUpdate(userId,
+              {$set: {password: hash}},
+              {new: true}).then( async () => {
+                await token.deleteOne(); // delete token after password reset
+                res.json({
+                message: 'password reset successfully',
+                data: user._id
+              })
+              }).save()
           })
         })
           } catch (err) {
@@ -154,3 +166,4 @@ export const pwdResetLink = async (req, res) => {
         })
       }
     }
+    

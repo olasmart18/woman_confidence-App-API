@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use('/wmapp', userRoute);
-app.use('/wmapp', homeRoute);
+app.use('/', homeRoute);
 app.use('/wmapp', storyRoute);
 app.use('/wmapp', authRoute);
 
