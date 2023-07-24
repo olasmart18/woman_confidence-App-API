@@ -215,3 +215,39 @@ export const createGroup = async (req, res) => {
 }
 
 // join group
+export const joinGroup = async (req, res) => {
+  try {
+    // find a group to join
+    await Group.findById({ _id: req.params.groupId}).then( async (group) => {
+      if (!group) {
+        return res.status(404).json({
+          success: false,
+          message: 'group not found or not exist'
+        });
+      }
+      // check for valid user before join group
+      await User.findOne({ _id: req.params.userId}).then( async (user) => {
+        if (!user) 
+          return res.status(404).json({
+            success: false,
+            message: 'not a valid user!, login to continue'
+          });
+          
+        // append user to groupMember
+        await Group.findByIdAndUpdate({ _id: req.params.groupId },
+          { $push: { groupMember: user }},
+          { new: true });
+      });
+      return res.status(200).json({
+        success: true,
+        message: `you join ${ group.groupName}`,
+        data: group
+      });
+    });
+  } catch (err) {
+     res.json({
+      message: err.message,
+      data: err
+    });
+  }
+}
