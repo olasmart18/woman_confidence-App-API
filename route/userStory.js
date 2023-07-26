@@ -5,7 +5,8 @@ import {
   writeStories,
   comments,
   deleteComment,
-  deleteStory
+  deleteStory,
+  exitGroup
 } from '../controllers/communityController.js';
 import verifyUser from '../utils/auth.js';
 
@@ -16,6 +17,6 @@ route.get('/stories', verifyUser, getallStories);
 route.post('/comment/:userId/:storyId', comments);
 route.delete('/comment/:userId/:storyId/:commentId', deleteComment)
 route.delete('/story/:userId/:storyId', deleteStory)
-
+route.put('/group/exit/:groupId/:userId', exitGroup)
 
 export default route;
