@@ -11,7 +11,8 @@ import {
   createEvent,
   createQuote,
   createGroup,
-  joinGroup
+  joinGroup,
+  newCouncellor
 } from '../controllers/homeController.js';
 
 const route = express.Router();
@@ -27,5 +28,7 @@ route.post('/wmapp/home/event/create/:userId', createEvent);
 route.post('/wmapp/home/quote/create/:userId', createQuote);
 route.post('/wmapp/home/group/create/:userId', createGroup);
 route.post('/wmapp/home/group/join/:groupId/:userId', joinGroup);
+route.post('/wmapp/home/councellor/:userId', newCouncellor);
+
 
 export default route;

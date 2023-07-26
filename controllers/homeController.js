@@ -3,6 +3,7 @@ import Event from '../model/events.js';
 import Group from '../model/groups.js';
 import Quote from '../model/quote.js';
 import User from '../model/user.js';
+import Councellor from '../model/councellor.js';
 
 
 
@@ -251,3 +252,49 @@ export const joinGroup = async (req, res) => {
     });
   }
 }
+
+// be a councellor
+export const newCouncellor = async (req, res) => {
+  try {
+    // check for existing user
+    const isUser = await User.findOne({ _id: req.params.userId});
+    if (!isUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'not a valid user, register to continue'
+      });
+    }
+    // create a new councellor
+    await new Councellor({
+      userId: isUser._id,
+      specification: req.body.specification,
+      experience: req.body.experience
+    }).save().then((councellor) => {
+      res.status(200).json({
+        success: true,
+        message: `congratulation on being a ${councellor.specification} councellor`,
+        data: councellor
+      });
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
