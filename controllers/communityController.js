@@ -213,3 +213,9 @@ export const exitGroup = async (req, res) => {
     });
   }
 }
+
+/**
+ * create a payment feature for
+ * event booking
+ * payment feature for charity donation
+ */

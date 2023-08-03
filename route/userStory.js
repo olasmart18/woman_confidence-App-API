@@ -12,7 +12,7 @@ import verifyUser from '../utils/auth.js';
 
 const route = express.Router();
 
-route.post('/story/:userId', verifyUser, writeStories);
+route.post('/story/:userId', writeStories);
 route.get('/stories', verifyUser, getallStories);
 route.post('/comment/:userId/:storyId', comments);
 route.delete('/comment/:userId/:storyId/:commentId', deleteComment)

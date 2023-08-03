@@ -25,13 +25,26 @@ export const homePage = async (req, res) => {
 
 // get recent stories (access: users and admin)
 export const recentStory = async (req, res) => {
-  try {
-    const stories = await Story.find({});
-    res.status(200).json({
+  const page = parseInt(req.query.page) || 1 // requested page by client
+  const dataPerPage = 5;
+  try { 
+    // number of data to skip
+    const skipData = (page - 1) * dataPerPage;
+     await Story.find({})
+    // add pagination , 5 stories per page
+    .skip(skipData).limit(dataPerPage)
+    .then((story) => {
+      if(story.length === 0) return res.status(404).json({
+        succes: true,
+        message: 'no more data found'
+      })
+      res.status(200).json({
       success: true,
       message: 'successful',
-      data: stories
+      data: story
     });
+    })
+    
   } catch (err) {
     res.status(404).json({
       success: false,
@@ -43,7 +56,7 @@ export const recentStory = async (req, res) => {
 // get events (access: users and admin)
 export const events = async (req, res) => {
   try {
-    const events = await Event.find({});
+    const events = await Event.find({})
    return res.status(200).json({
       success: true,
       message: 'successful',
@@ -283,18 +296,4 @@ export const newCouncellor = async (req, res) => {
     });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
