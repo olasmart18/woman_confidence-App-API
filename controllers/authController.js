@@ -141,7 +141,7 @@ export const pwdResetLink = async (req, res) => {
             if (!token) return res.status(404).json({
               message: 'no token find for user'
             })
-            if (token.token !== token) return error
+            if (token.token !== user.token) return error
             // input new password
             const password = req.body.password;
             // hash new password

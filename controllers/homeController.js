@@ -55,13 +55,23 @@ export const recentStory = async (req, res) => {
 
 // get events (access: users and admin)
 export const events = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const dataPerPage = 5;
   try {
-    const events = await Event.find({})
-   return res.status(200).json({
+    const skipPage = (page - 1) * dataPerPage;
+     await Event.find({})
+    .skip(skipPage).limit(dataPerPage).then((event) => {
+      if (event.length === 0) {
+        return res.status(201).json({
+          message: 'no more data found'
+        })
+      }
+      return res.status(200).json({
       success: true,
       message: 'successful',
       data: events
     });
+    })
   } catch (err) {
     res.status(404).json({
       success: false,
@@ -89,13 +99,23 @@ export const events = async (req, res) => {
 
 // get daily quote (access: users and admin)
 export const dailyQuote = async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // requested page
+  const dataPerPage = 5;
   try {
-    const quotes = await Quote.find({});
-    res.status(200).json({
+    // fectch daily quote from external api
+    // randomly fetch quotes from db or external api
+    const skipData = (page - 1) * dataPerPage;
+    await Quote.find({}).skip(skipData).limit(dataPerPage)
+    .then((quote) => {
+      if (quote.length === 0) {
+        return res.status(200).json({ message: 'no more data fetch'})
+      }
+      res.status(200).json({
       success: true,
       message: 'successful',
       data: quotes
     });
+    }) 
   } catch (err) {
     res.status(404).json({
       success: false,
@@ -123,13 +143,21 @@ export const discoverGroup = async (req, res) => {
 
 // all availaible councellor
 export const councellor = async (req, res) => {
+  const page = parseInt(req.query.page) || 1 // requested page;
+  const dataPerPage = 5;
   try {
-    const councellors = await Councellor.find({});
-    res.status(200).json({
+    const skipData = (page - 1) * dataPerPage;
+    await Councellor.find({})
+    .skip(skipData).limit(dataPerPage).then((councellor) => {
+      if (councellor.length === 0){
+      return res.status(200).json({ message: 'no more councellorfound'});
+    }
+      res.status(200).json({
       success: true,
       message: 'successful',
-      data: [councellors]
+      data: [councellor]
     });
+    })
   } catch (err) {
     res.status(404).json({
       success: false,
@@ -171,6 +199,7 @@ export const createEvent = async (req, res) => {
 }
 
 // compose quote
+// fetch quote fron third party api and save to db
 export const createQuote = async (req, res) => {
   try {
     await User.findOne({ _id: req.params.userId }).then( async (user) => {
