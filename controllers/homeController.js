@@ -1,3 +1,4 @@
+import axios from 'axios';
 import Story from '../model/userStory.js';
 import Event from '../model/events.js';
 import Group from '../model/groups.js';
@@ -38,7 +39,7 @@ export const recentStory = async (req, res) => {
         succes: true,
         message: 'no more data found'
       })
-      res.status(200).json({
+     return res.status(200).json({
       success: true,
       message: 'successful',
       data: story
@@ -46,7 +47,7 @@ export const recentStory = async (req, res) => {
     })
     
   } catch (err) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: ' not found'
     });
@@ -73,7 +74,7 @@ export const events = async (req, res) => {
     });
     })
   } catch (err) {
-    res.status(404).json({
+   return  res.status(404).json({
       success: false,
       message: 'not found'
     });
@@ -110,14 +111,14 @@ export const dailyQuote = async (req, res) => {
       if (quote.length === 0) {
         return res.status(200).json({ message: 'no more data fetch'})
       }
-      res.status(200).json({
+     return res.status(200).json({
       success: true,
       message: 'successful',
-      data: quotes
+      data: quote
     });
     }) 
   } catch (err) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: 'not found'
     });
@@ -128,13 +129,13 @@ export const dailyQuote = async (req, res) => {
 export const discoverGroup = async (req, res) => {
   try {
     const groups = await Group.find({});
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: 'successful',
       data: [groups]
     });
   } catch (err) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: 'not found'
     });
@@ -152,14 +153,14 @@ export const councellor = async (req, res) => {
       if (councellor.length === 0){
       return res.status(200).json({ message: 'no more councellorfound'});
     }
-      res.status(200).json({
+      return res.status(200).json({
       success: true,
       message: 'successful',
       data: [councellor]
     });
     })
   } catch (err) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: 'not found'
     });
@@ -172,7 +173,7 @@ export const createEvent = async (req, res) => {
     const isUser = req.params.userId
     await User.findOne({ _id: isUser}).then( async (user) => {
       if(!user) {
-        res.status(404).json({
+        return res.status(404).json({
         success: false,
         message: 'you are not logged In, login to continue'
         })
@@ -185,21 +186,20 @@ export const createEvent = async (req, res) => {
         userId: user._id
       });
       await newEvent.save();
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: 'your event has been schedule',
         data: newEvent
       })
     })
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: err.message
     })
   }
 }
 
 // compose quote
-// fetch quote fron third party api and save to db
 export const createQuote = async (req, res) => {
   try {
     await User.findOne({ _id: req.params.userId }).then( async (user) => {
@@ -213,16 +213,41 @@ export const createQuote = async (req, res) => {
         quote: req.body.quote,
       })
       await newQuote.save();
-      res.json({
+      return res.json({
         success: true,
         message: 'your quote is purblished',
         data: newQuote.quote
       });
     })
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message
+    })
+  }
+}
+
+// fetch quote fron third party api and save to db
+export const fetchQuote = async (req, res) => {
+  const apiKey = process.env.API_KEY;
+  const baseUrl = 'http://quotes.rest/qod?category=inspiration'
+  try {
+    await axios.get(baseUrl,
+      {
+      headers: {
+        'X-TheySaidSo-Api-Secret': apiKey
+      }
+    }).then((response) => {
+      return res.status(200).json({
+        success: true,
+        data: response.data.contents.quotes[0]
+      })
+    })
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+      data: err
     })
   }
 }
@@ -232,7 +257,7 @@ export const createGroup = async (req, res) => {
   try {
     await User.findOne({ _id: req.params.userId }).then( async (user) => {
       if (!user) {
-        res.status(404).json({
+        return res.status(404).json({
           message: 'login to continue'
         })
         return;
@@ -243,14 +268,14 @@ export const createGroup = async (req, res) => {
         description: req.body.description
       })
       await newGroup.save();
-      res.json({
+      return res.json({
         success: true,
         mesage: `you created ${newGroup.groupName} Group`,
         data: newGroup
       });
     })
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message
     })
@@ -312,14 +337,14 @@ export const newCouncellor = async (req, res) => {
       specification: req.body.specification,
       experience: req.body.experience
     }).save().then((councellor) => {
-      res.status(200).json({
+      return  res.status(200).json({
         success: true,
         message: `congratulation on being a ${councellor.specification} councellor`,
         data: councellor
       });
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message
     });

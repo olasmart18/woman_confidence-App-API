@@ -1,7 +1,7 @@
 import express from 'express';
 
 import {
-  getallStories,
+  // getallStories,
   writeStories,
   comments,
   deleteComment,
@@ -13,7 +13,7 @@ import verifyUser from '../utils/auth.js';
 const route = express.Router();
 
 route.post('/story/:userId', writeStories);
-route.get('/stories', verifyUser, getallStories);
+// route.get('/stories', verifyUser, getallStories);// remove from here
 route.post('/comment/:userId/:storyId', comments);
 route.delete('/comment/:userId/:storyId/:commentId', deleteComment)
 route.delete('/story/:userId/:storyId', deleteStory)
