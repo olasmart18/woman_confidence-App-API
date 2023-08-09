@@ -66,7 +66,7 @@ export const login = async (req, res) => {
                         status: 'error',
                         message: 'not token created'
                     })
-                    res.cookie('accessToken', token, {
+                    res.cookie('token', token, {
                        expiresIn: token.expiresIn,
                         httpOnly: true
                     }).json({
