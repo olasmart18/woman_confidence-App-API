@@ -230,7 +230,7 @@ export const createQuote = async (req, res) => {
 // fetch quote fron third party api and save to db
 export const fetchQuote = async (req, res) => {
   const apiKey = process.env.API_KEY;
-  const baseUrl = 'http://quotes.rest/qod?category=inspiration'
+  const baseUrl = 'http://quotes.rest/qod?category=inspire'
   try {
     await axios.get(baseUrl,
       {
