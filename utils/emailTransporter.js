@@ -27,13 +27,17 @@ const sendEmail = async ( email, subject, text) => {
             }
         })
         // create a mail container
-        await emailTransporter.sendMail({
+         emailTransporter.sendMail({
             from: test.user,
             to: email,
             subject: subject,
             text: text
+        }, (err) => {
+            if (!err){
+                console.log(`email sent to ${email}`)
+            }
+            // console.log(err);
         })
-        console.log(`email sent to ${email}`)
         })
        
     } catch (err) {

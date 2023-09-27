@@ -66,7 +66,7 @@ export const login = async (req, res) => {
                         status: 'error',
                         message: 'not token created'
                     })
-                    res.cookie('accessToken', token, {
+                    res.cookie('token', token, {
                        expiresIn: token.expiresIn,
                         httpOnly: true
                     }).json({
@@ -107,7 +107,7 @@ export const pwdResetLink = async (req, res) => {
             userId: user._id
            }).save();
            // password reset link
-           const resetLink = `${process.env.BASE_URL}/password-reset/${createToken}/${user._id}`
+           const resetLink = `${process.env.BASE_URL}/auth/reset-password/${user._id}/${createToken}`
            await sendEmail(user.email, 'reset-password', resetLink)
            .then(() => {
             return res.status(200).json({
@@ -129,11 +129,7 @@ export const pwdResetLink = async (req, res) => {
      export const resetPassword = async (req, res) => {
        const { userId, token } = req.params;
       try {
-        const error = res.json({
-          message: 'token is not valid'
-        });
-       
-        await User.findOne({ userId: userId }).then( async (user) => {
+        await User.findOne({ _id: userId }).then( async (user) => {
           if (!user) return res.status(404).json({
             message: 'not a user'
           })
@@ -141,7 +137,6 @@ export const pwdResetLink = async (req, res) => {
             if (!token) return res.status(404).json({
               message: 'no token find for user'
             })
-            if (token.token !== token) return error
             // input new password
             const password = req.body.password;
             // hash new password
@@ -152,15 +147,15 @@ export const pwdResetLink = async (req, res) => {
               {$set: {password: hash}},
               {new: true}).then( async () => {
                 await token.deleteOne(); // delete token after password reset
-                res.json({
+               return res.json({
                 message: 'password reset successfully',
                 data: user._id
               })
-              }).save()
+              })
           })
         })
           } catch (err) {
-        res.status(500).json({
+       return res.status(500).json({
           message: err.message,
           data: err
         })

@@ -5,7 +5,7 @@ const route = express.Router();
 route.post('/auth/register', register);
 route.post('/auth/login', login);
 route.post('/auth/reset-password', pwdResetLink)
-route.post('/auth/reset-password/:token/:userId', resetPassword);
+route.post('/auth/reset-password/:userId/:token', resetPassword);
 
 
 

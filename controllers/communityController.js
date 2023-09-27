@@ -1,23 +1,24 @@
  import Story from '../model/userStory.js';
 import User from '../model/user.js';
 import Comment from '../model/comment.js';
+import Group from "../model/groups.js";
 
 // get all user stories (access: users amd admin)
-export const getallStories = async (req, res) => {
-  try {
-    const stories = await Story.find({});
-    res.status(200).json({
-      success: true,
-      message: 'successful',
-      data: stories
-    });
-  } catch (err) {
-    res.ststus(404).json({
-      succes: false,
-      message: 'error 404, try again'
-    });
-  }
-};
+// export const getallStories = async (req, res) => {
+//   try {
+//     const stories = await Story.find({});
+//     res.status(200).json({
+//       success: true,
+//       message: 'successful',
+//       data: stories
+//     });
+//   } catch (err) {
+//     res.ststus(404).json({
+//       succes: false,
+//       message: 'error 404, try again'
+//     });
+//   }
+// };
 
 // post stories (access: user)
 export const writeStories = async (req, res) => {
@@ -187,3 +188,34 @@ export const deleteComment = async (req, res) => {
   }
 }
 
+// leave group
+export const exitGroup = async (req, res) => {
+  try {
+    await User.findOne({ _id: req.params.userId}).then( async (user) => {
+      if (!user) return res.status(404).json({
+        succes: false,
+        message: 'no user of such found'
+      });
+      // find group and remove user
+      await Group.findByIdAndUpdate({ _id: req.params.groupId},
+        { $pull: {groupMember: user._id }},
+        { new: true }).then((group) => {
+           res.status(200).json({
+          succes: true,
+          message: `you left ${group.groupName} group`
+        })
+        })
+    })
+  } catch (err) {
+    res.status(500).json({
+      succes: false,
+      message: err.message
+    });
+  }
+}
+
+/**
+ * create a payment feature for
+ * event booking
+ * payment feature for charity donation
+ */

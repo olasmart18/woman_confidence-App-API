@@ -1,8 +1,10 @@
+import axios from 'axios';
 import Story from '../model/userStory.js';
 import Event from '../model/events.js';
 import Group from '../model/groups.js';
 import Quote from '../model/quote.js';
 import User from '../model/user.js';
+import Councellor from '../model/councellor.js';
 
 
 
@@ -24,15 +26,28 @@ export const homePage = async (req, res) => {
 
 // get recent stories (access: users and admin)
 export const recentStory = async (req, res) => {
-  try {
-    const stories = await Story.find({});
-    res.status(200).json({
+  const page = parseInt(req.query.page) || 1 // requested page by client
+  const dataPerPage = 5;
+  try { 
+    // number of data to skip
+    const skipData = (page - 1) * dataPerPage;
+     await Story.find({})
+    // add pagination , 5 stories per page
+    .skip(skipData).limit(dataPerPage)
+    .then((story) => {
+      if(story.length === 0) return res.status(404).json({
+        succes: true,
+        message: 'no more data found'
+      })
+     return res.status(200).json({
       success: true,
       message: 'successful',
-      data: stories
+      data: story
     });
+    })
+    
   } catch (err) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: ' not found'
     });
@@ -41,15 +56,25 @@ export const recentStory = async (req, res) => {
 
 // get events (access: users and admin)
 export const events = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const dataPerPage = 5;
   try {
-    const events = await Event.find({});
-   return res.status(200).json({
+    const skipPage = (page - 1) * dataPerPage;
+     await Event.find({})
+    .skip(skipPage).limit(dataPerPage).then((event) => {
+      if (event.length === 0) {
+        return res.status(201).json({
+          message: 'no more data found'
+        })
+      }
+      return res.status(200).json({
       success: true,
       message: 'successful',
       data: events
     });
+    })
   } catch (err) {
-    res.status(404).json({
+   return  res.status(404).json({
       success: false,
       message: 'not found'
     });
@@ -75,15 +100,25 @@ export const events = async (req, res) => {
 
 // get daily quote (access: users and admin)
 export const dailyQuote = async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // requested page
+  const dataPerPage = 5;
   try {
-    const quotes = await Quote.find({});
-    res.status(200).json({
+    // fectch daily quote from external api
+    // randomly fetch quotes from db or external api
+    const skipData = (page - 1) * dataPerPage;
+    await Quote.find({}).skip(skipData).limit(dataPerPage)
+    .then((quote) => {
+      if (quote.length === 0) {
+        return res.status(200).json({ message: 'no more data fetch'})
+      }
+     return res.status(200).json({
       success: true,
       message: 'successful',
-      data: quotes
+      data: quote
     });
+    }) 
   } catch (err) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: 'not found'
     });
@@ -94,13 +129,13 @@ export const dailyQuote = async (req, res) => {
 export const discoverGroup = async (req, res) => {
   try {
     const groups = await Group.find({});
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: 'successful',
       data: [groups]
     });
   } catch (err) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: 'not found'
     });
@@ -109,15 +144,23 @@ export const discoverGroup = async (req, res) => {
 
 // all availaible councellor
 export const councellor = async (req, res) => {
+  const page = parseInt(req.query.page) || 1 // requested page;
+  const dataPerPage = 5;
   try {
-    const councellors = await Councellor.find({});
-    res.status(200).json({
+    const skipData = (page - 1) * dataPerPage;
+    await Councellor.find({})
+    .skip(skipData).limit(dataPerPage).then((councellor) => {
+      if (councellor.length === 0){
+      return res.status(200).json({ message: 'no more councellorfound'});
+    }
+      return res.status(200).json({
       success: true,
       message: 'successful',
-      data: [councellors]
+      data: [councellor]
     });
+    })
   } catch (err) {
-    res.status(404).json({
+    return res.status(404).json({
       success: false,
       message: 'not found'
     });
@@ -130,7 +173,7 @@ export const createEvent = async (req, res) => {
     const isUser = req.params.userId
     await User.findOne({ _id: isUser}).then( async (user) => {
       if(!user) {
-        res.status(404).json({
+        return res.status(404).json({
         success: false,
         message: 'you are not logged In, login to continue'
         })
@@ -143,14 +186,14 @@ export const createEvent = async (req, res) => {
         userId: user._id
       });
       await newEvent.save();
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: 'your event has been schedule',
         data: newEvent
       })
     })
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: err.message
     })
   }
@@ -170,16 +213,41 @@ export const createQuote = async (req, res) => {
         quote: req.body.quote,
       })
       await newQuote.save();
-      res.json({
+      return res.json({
         success: true,
         message: 'your quote is purblished',
         data: newQuote.quote
       });
     })
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message
+    })
+  }
+}
+
+// fetch quote fron third party api and save to db
+export const fetchQuote = async (req, res) => {
+  const apiKey = process.env.API_KEY;
+  const baseUrl = 'http://quotes.rest/qod?category=inspire'
+  try {
+    await axios.get(baseUrl,
+      {
+      headers: {
+        'X-TheySaidSo-Api-Secret': apiKey
+      }
+    }).then((response) => {
+      return res.status(200).json({
+        success: true,
+        data: response.data.contents.quotes[0]
+      })
+    })
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+      data: err
     })
   }
 }
@@ -189,7 +257,7 @@ export const createGroup = async (req, res) => {
   try {
     await User.findOne({ _id: req.params.userId }).then( async (user) => {
       if (!user) {
-        res.status(404).json({
+        return res.status(404).json({
           message: 'login to continue'
         })
         return;
@@ -200,14 +268,14 @@ export const createGroup = async (req, res) => {
         description: req.body.description
       })
       await newGroup.save();
-      res.json({
+      return res.json({
         success: true,
         mesage: `you created ${newGroup.groupName} Group`,
         data: newGroup
       });
     })
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message
     })
@@ -251,3 +319,35 @@ export const joinGroup = async (req, res) => {
     });
   }
 }
+
+// be a councellor
+export const newCouncellor = async (req, res) => {
+  try {
+    // check for existing user
+    const isUser = await User.findOne({ _id: req.params.userId});
+    if (!isUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'not a valid user, register to continue'
+      });
+    }
+    // create a new councellor
+    await new Councellor({
+      userId: isUser._id,
+      specification: req.body.specification,
+      experience: req.body.experience
+    }).save().then((councellor) => {
+      return  res.status(200).json({
+        success: true,
+        message: `congratulation on being a ${councellor.specification} councellor`,
+        data: councellor
+      });
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.message
+    });
+  }
+}
+
